@@ -1,0 +1,3027 @@
+<title>Streakline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #EDF0EA;
+    --surface: #FFFFFF;
+    --surface-2: #F3F5F0;
+    --ink: #131915;
+    --muted: #5F6A63;
+    --line: #DCE1D8;
+    --accent: #FF5A1F;
+    --on-c: #FFFFFF;
+    --danger: #C3322A;
+    --shadow: 0 1px 2px rgba(19, 25, 21, .05), 0 10px 30px rgba(19, 25, 21, .07);
+    --font-display: "Bricolage Grotesque", ui-rounded, system-ui, -apple-system, sans-serif;
+    --font-body: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0D110F;
+      --surface: #161B18;
+      --surface-2: #1D2320;
+      --ink: #EBEFE9;
+      --muted: #96A199;
+      --line: #29302C;
+      --accent: #FF6A30;
+      --danger: #FF6B61;
+      --shadow: none;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0D110F;
+    --surface: #161B18;
+    --surface-2: #1D2320;
+    --ink: #EBEFE9;
+    --muted: #96A199;
+    --line: #29302C;
+    --accent: #FF6A30;
+    --danger: #FF6B61;
+    --shadow: none;
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box
+  }
+
+  [hidden] {
+    display: none !important
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased
+  }
+
+  button,
+  select {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent
+  }
+
+  button:disabled {
+    opacity: .35;
+    cursor: default
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px
+  }
+
+  .app {
+    max-width: 560px;
+    margin: 0 auto;
+    padding-inline: 16px;
+    padding-block: 24px 140px;
+    display: grid;
+    gap: 22px
+  }
+
+  /* Header */
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px
+  }
+
+  .eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted)
+  }
+
+  h1 {
+    margin: 4px 0 2px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(30px, 8vw, 40px);
+    line-height: 1.02;
+    letter-spacing: -.02em;
+    text-wrap: balance
+  }
+
+  .sub {
+    margin: 0;
+    color: var(--muted)
+  }
+
+  .ring {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    flex: none
+  }
+
+  .ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg)
+  }
+
+  .ring circle {
+    fill: none;
+    stroke-width: 7
+  }
+
+  .ring .track {
+    stroke: var(--line)
+  }
+
+  .ring .fill {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    transition: stroke-dashoffset .5s ease
+  }
+
+  .ring span {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums
+  }
+
+  /* Focus-now call to action */
+  .now-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    border: 0;
+    border-radius: 18px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 14px 16px;
+    text-align: left
+  }
+
+  .now-btn .ico {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: grid;
+    place-items: center;
+    flex: none
+  }
+
+  .now-btn .ico svg {
+    width: 18px;
+    height: 18px;
+    fill: #fff;
+    margin-left: 3px
+  }
+
+  .now-btn b {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.15
+  }
+
+  .now-btn small {
+    display: block;
+    font-size: 13px;
+    opacity: .72
+  }
+
+  /* Work session */
+  .session {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow)
+  }
+
+  .s-main {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+    flex: 1 1 200px
+  }
+
+  .s-kick {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted)
+  }
+
+  .s-text {
+    margin: 0;
+    font-weight: 500
+  }
+
+  .s-text select {
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 3px 6px;
+    font-size: 14px
+  }
+
+  .s-bar {
+    height: 5px;
+    border-radius: 99px;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--line);
+    overflow: hidden;
+    margin-top: 6px
+  }
+
+  .s-bar i {
+    display: block;
+    height: 100%;
+    background: var(--ink);
+    opacity: .75
+  }
+
+  .s-acts {
+    display: flex;
+    gap: 8px
+  }
+
+  .s-btn {
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-weight: 500
+  }
+
+  .s-btn.go {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink)
+  }
+
+  .session.due {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff
+  }
+
+  .session.due .s-kick {
+    color: rgba(255, 255, 255, .85)
+  }
+
+  .session.due .s-btn {
+    background: rgba(255, 255, 255, .18);
+    border-color: rgba(255, 255, 255, .4);
+    color: #fff
+  }
+
+  .session.due .s-btn.go {
+    background: #fff;
+    color: #1a1a1a;
+    border-color: #fff
+  }
+
+  @media (prefers-reduced-motion:no-preference) {
+    .session.due {
+      animation: breathe 2.4s ease-in-out infinite
+    }
+  }
+
+  @keyframes breathe {
+    50% {
+      transform: scale(1.012)
+    }
+  }
+
+  /* Lists */
+  .groups {
+    display: grid;
+    gap: 18px
+  }
+
+  .section-label {
+    margin: 0 0 8px 4px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 400
+  }
+
+  .section-label.now {
+    color: var(--ink);
+    font-weight: 500
+  }
+
+  .list {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden
+  }
+
+  .habit {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    padding: 14px 14px 14px 12px;
+    align-items: start;
+    transition: background .3s ease
+  }
+
+  .habit+.habit {
+    border-top: 1px solid var(--line)
+  }
+
+  .habit.rest {
+    opacity: .78
+  }
+
+  .habit.cue {
+    background: color-mix(in srgb, var(--c) 9%, var(--surface))
+  }
+
+  .cue-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--c);
+    font-weight: 500;
+    margin-bottom: -6px
+  }
+
+  .lead {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 0;
+    background: transparent;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    transition: background .15s ease, transform .15s ease
+  }
+
+  .lead:active {
+    transform: scale(.92)
+  }
+
+  .lead.plain {
+    box-shadow: inset 0 0 0 2px var(--c)
+  }
+
+  .lead svg.pr {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg)
+  }
+
+  .pr .t {
+    fill: none;
+    stroke: var(--line);
+    stroke-width: 4
+  }
+
+  .pr .f {
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dashoffset .35s ease
+  }
+
+  .lead .tick {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: var(--on-c);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transform: scale(.6);
+    transition: opacity .15s ease, transform .2s ease
+  }
+
+  .lead .play {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    fill: var(--c);
+    margin-left: 3px
+  }
+
+  .lead .lab {
+    position: relative;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--c);
+    font-variant-numeric: tabular-nums
+  }
+
+  .lead.full {
+    background: var(--c)
+  }
+
+  .lead.full .tick {
+    opacity: 1;
+    transform: scale(1)
+  }
+
+  .lead.full .lab {
+    color: var(--on-c)
+  }
+
+  .lead.full .pr {
+    display: none
+  }
+
+  @media (prefers-reduced-motion:no-preference) {
+    .lead.pop {
+      animation: pop .45s ease
+    }
+
+    @keyframes pop {
+      40% {
+        transform: scale(1.14)
+      }
+    }
+  }
+
+  .habit-body {
+    min-width: 0;
+    display: grid;
+    gap: 10px
+  }
+
+  .head-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px
+  }
+
+  .habit-name {
+    all: unset;
+    cursor: pointer;
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+    border-radius: 6px
+  }
+
+  .habit-name:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px
+  }
+
+  .habit-name .name {
+    font-weight: 600;
+    font-size: 16px;
+    overflow-wrap: anywhere
+  }
+
+  .habit.done .habit-name .name {
+    color: var(--muted)
+  }
+
+  .focus-btn {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    display: grid;
+    place-items: center;
+    padding: 0
+  }
+
+  .focus-btn svg {
+    width: 13px;
+    height: 13px;
+    fill: var(--c);
+    margin-left: 2px
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .streak.on {
+    color: var(--c);
+    font-weight: 500
+  }
+
+  .after {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px
+  }
+
+  .after svg {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round
+  }
+
+  .risk {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--c);
+    font-weight: 500
+  }
+
+  .amount {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap
+  }
+
+  .amount .num {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums
+  }
+
+  .amount .num b {
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--ink)
+  }
+
+  .mini {
+    margin-left: auto;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .bar {
+    height: 8px;
+    border-radius: 99px;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--line);
+    overflow: hidden
+  }
+
+  .bar i {
+    display: block;
+    height: 100%;
+    background: var(--c);
+    border-radius: inherit;
+    transition: width .35s ease
+  }
+
+  .nudge {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: -4px 0 0
+  }
+
+  .nudge.due {
+    color: var(--c);
+    font-weight: 500
+  }
+
+  .parts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px
+  }
+
+  .part {
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 6px 12px 6px 8px;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    text-align: left
+  }
+
+  .part svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round
+  }
+
+  .part .ck,
+  .med .ck {
+    display: none
+  }
+
+  .part.is-done {
+    background: var(--c);
+    border-color: var(--c);
+    color: var(--on-c)
+  }
+
+  .part.is-done .ck {
+    display: block
+  }
+
+  .part.is-done .ci {
+    display: none
+  }
+
+  .part.is-next {
+    box-shadow: inset 0 0 0 1px var(--c);
+    border-color: var(--c);
+    color: var(--ink);
+    font-weight: 500
+  }
+
+  /* Meds rows */
+  .meds {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px
+  }
+
+  .meds li {
+    display: grid;
+    gap: 3px
+  }
+
+  .med {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 8px 10px;
+    text-align: left
+  }
+
+  .med .box {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    border: 2px solid var(--c);
+    display: grid;
+    place-items: center
+  }
+
+  .med svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: var(--on-c);
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round
+  }
+
+  .med .nm {
+    min-width: 0;
+    display: grid
+  }
+
+  .med .nm b {
+    font-weight: 500;
+    font-size: 14px;
+    overflow-wrap: anywhere
+  }
+
+  .med .nm span {
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .med .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted)
+  }
+
+  .med.is-done {
+    opacity: .7
+  }
+
+  .med.is-done .box {
+    background: var(--c)
+  }
+
+  .med.is-done .ck {
+    display: block
+  }
+
+  .med.is-next {
+    border-color: var(--c);
+    box-shadow: inset 0 0 0 1px var(--c)
+  }
+
+  .stock {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    padding-left: 44px
+  }
+
+  .stock.low {
+    color: var(--danger);
+    font-weight: 500
+  }
+
+  .strip {
+    display: flex;
+    gap: 6px
+  }
+
+  .cell {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border: 1px solid transparent;
+    transition: background .15s ease
+  }
+
+  .cell.is-done {
+    background: var(--c);
+    color: var(--on-c)
+  }
+
+  .cell.is-partial {
+    background: linear-gradient(to top, color-mix(in srgb, var(--c) 45%, transparent) var(--p), var(--surface-2) var(--p));
+    border-color: var(--line);
+    color: var(--ink)
+  }
+
+  .cell.is-missed {
+    background: var(--surface-2);
+    border-color: var(--line);
+    color: var(--muted)
+  }
+
+  .cell.is-rest {
+    background: transparent;
+    border: 1px dashed var(--line);
+    color: var(--muted)
+  }
+
+  .cell.is-today:not(.is-done) {
+    border: 1.5px solid var(--c);
+    color: var(--ink)
+  }
+
+  .skeleton {
+    height: 92px;
+    background: var(--surface)
+  }
+
+  .skeleton+.skeleton {
+    border-top: 1px solid var(--line)
+  }
+
+  @media (prefers-reduced-motion:no-preference) {
+    .skeleton {
+      animation: pulse 1.4s ease-in-out infinite
+    }
+  }
+
+  @keyframes pulse {
+    50% {
+      opacity: .55
+    }
+  }
+
+  .empty {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px 18px;
+    display: grid;
+    gap: 14px;
+    box-shadow: var(--shadow)
+  }
+
+  .empty h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600
+  }
+
+  .empty p {
+    margin: 0;
+    color: var(--muted);
+    max-width: 44ch
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px
+  }
+
+  .chip {
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 8px 13px;
+    font-size: 14px
+  }
+
+  .chip:hover {
+    border-color: var(--muted)
+  }
+
+  .sync {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .sync i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2FA36B
+  }
+
+  .sync.local i {
+    background: #C9A227
+  }
+
+  .sync.saving i {
+    background: var(--accent)
+  }
+
+  .fab {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    border: 0;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 14px 22px;
+    font-weight: 600;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .22);
+    z-index: 5
+  }
+
+  .fab svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    fill: none;
+    stroke-linecap: round
+  }
+
+  /* Sheet */
+  dialog.sheet {
+    border: 0;
+    padding: 0;
+    background: var(--surface);
+    color: var(--ink);
+    width: 100%;
+    max-width: min(560px, 100%);
+    max-height: min(92vh, 900px);
+    margin: auto auto 0;
+    border-radius: 22px 22px 0 0;
+    overflow: auto;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, .22)
+  }
+
+  @media (min-width:640px) {
+    dialog.sheet {
+      margin: auto;
+      border-radius: 22px
+    }
+  }
+
+  dialog::backdrop {
+    background: rgba(8, 12, 10, .5)
+  }
+
+  .sheet-inner {
+    padding: 18px 16px calc(22px + env(safe-area-inset-bottom, 0px));
+    display: grid;
+    gap: 20px
+  }
+
+  .sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px
+  }
+
+  .sheet-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600
+  }
+
+  .head-acts {
+    display: flex;
+    gap: 8px;
+    align-items: center
+  }
+
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 0;
+    background: var(--surface-2);
+    display: grid;
+    place-items: center;
+    padding: 0;
+    flex: none
+  }
+
+  .icon-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+    stroke-linecap: round
+  }
+
+  .pill-btn {
+    border: 0;
+    border-radius: 999px;
+    background: var(--c, var(--ink));
+    color: var(--on-c);
+    padding: 9px 14px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px
+  }
+
+  .pill-btn svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor
+  }
+
+  .field {
+    display: grid;
+    gap: 8px
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted)
+  }
+
+  .hint {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted)
+  }
+
+  input[type="text"],
+  input[type="number"],
+  .select {
+    width: 100%;
+    height: 50px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--ink);
+    padding: 0 14px;
+    font: inherit;
+    font-size: 16px
+  }
+
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  .select:focus {
+    outline: 2px solid var(--c, var(--accent));
+    outline-offset: 1px
+  }
+
+  .grid3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px
+  }
+
+  .grid3 label {
+    display: grid;
+    gap: 6px;
+    min-width: 0
+  }
+
+  .seg {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 3px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 4px
+  }
+
+  .seg button {
+    border: 0;
+    background: transparent;
+    border-radius: 9px;
+    padding: 9px 0;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--muted)
+  }
+
+  .seg button[aria-pressed="true"] {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .14)
+  }
+
+  .swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px
+  }
+
+  .swatch {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 0;
+    background: var(--sw);
+    padding: 0;
+    transition: box-shadow .15s ease
+  }
+
+  .swatch[aria-pressed="true"] {
+    box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--sw)
+  }
+
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px
+  }
+
+  .day {
+    height: 42px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 0
+  }
+
+  .day[aria-pressed="true"] {
+    background: var(--c);
+    border-color: var(--c);
+    color: var(--on-c)
+  }
+
+  .presets {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap
+  }
+
+  .linkish {
+    border: 0;
+    background: none;
+    padding: 4px 2px;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 3px
+  }
+
+  .error {
+    margin: 0;
+    color: var(--danger);
+    font-size: 14px
+  }
+
+  /* Step editor (todo-list style) */
+  .items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px
+  }
+
+  .it {
+    display: grid;
+    gap: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px
+  }
+
+  .it-row {
+    display: flex;
+    align-items: center;
+    gap: 2px
+  }
+
+  .it-num {
+    width: 22px;
+    flex: none;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .it input[type="text"].it-name {
+    height: 40px;
+    border: 0;
+    background: transparent;
+    padding: 0 6px;
+    border-radius: 8px;
+    flex: 1;
+    min-width: 0;
+    width: auto
+  }
+
+  .it-btn {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    background: transparent;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    color: var(--muted)
+  }
+
+  .it-btn:hover:not(:disabled) {
+    background: var(--surface)
+  }
+
+  .it-btn svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round
+  }
+
+  .it-extra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-left: 24px;
+    align-items: center
+  }
+
+  .it-extra input[type="text"],
+  .it-extra input[type="number"],
+  .it-extra select {
+    height: 36px;
+    font-size: 14px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 0 8px;
+    color: var(--ink)
+  }
+
+  .it-extra .dose {
+    flex: 1 1 130px;
+    width: auto
+  }
+
+  .it-extra .xs {
+    width: 72px
+  }
+
+  .it-extra label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted)
+  }
+
+  .it-extra input[type="date"] {
+    height: 36px;
+    font: inherit;
+    font-size: 14px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 0 8px;
+    color: var(--ink)
+  }
+
+  .it-sched {
+    border-top: 1px dashed var(--line);
+    padding-top: 6px
+  }
+
+  .mdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    width: 100%
+  }
+
+  .mday {
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 0
+  }
+
+  .mday[aria-pressed="true"] {
+    background: var(--c);
+    border-color: var(--c);
+    color: var(--on-c)
+  }
+
+  .later {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .med .tag {
+    text-align: right;
+    line-height: 1.35
+  }
+
+  .add-item {
+    justify-self: start;
+    border: 1px dashed var(--line);
+    background: transparent;
+    border-radius: 10px;
+    padding: 9px 14px;
+    color: var(--muted);
+    font-weight: 500
+  }
+
+  .add-item:hover {
+    border-color: var(--muted);
+    color: var(--ink)
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px
+  }
+
+  @media (max-width:480px) {
+    .stats {
+      grid-template-columns: repeat(2, 1fr)
+    }
+  }
+
+  .stat {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 10px 12px
+  }
+
+  .stat b {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums
+  }
+
+  .stat.hot b {
+    color: var(--c)
+  }
+
+  .stat span {
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .hm {
+    display: grid;
+    grid-template-columns: 20px repeat(16, 1fr);
+    grid-template-rows: repeat(7, auto);
+    grid-auto-flow: column;
+    gap: 3px
+  }
+
+  .hm .lbl {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    display: grid;
+    place-items: center start
+  }
+
+  .hm .hc {
+    aspect-ratio: 1;
+    width: 100%;
+    border-radius: 4px;
+    padding: 0;
+    border: 0;
+    background: var(--surface-2)
+  }
+
+  .hm .hc.is-done {
+    background: var(--c)
+  }
+
+  .hm .hc.is-partial {
+    background: linear-gradient(to top, color-mix(in srgb, var(--c) 55%, transparent) var(--p), var(--line) var(--p))
+  }
+
+  .hm .hc.is-rest {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--line)
+  }
+
+  .hm .hc.is-missed {
+    background: var(--line)
+  }
+
+  .hm .hc.future {
+    background: transparent
+  }
+
+  .hm .hc.is-today {
+    box-shadow: inset 0 0 0 1.5px var(--ink)
+  }
+
+  .hm-cap {
+    margin: 6px 0 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted)
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px
+  }
+
+  .primary {
+    border: 0;
+    border-radius: 12px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 13px 22px;
+    font-weight: 600;
+    margin-left: auto
+  }
+
+  .danger-link {
+    border: 0;
+    background: none;
+    color: var(--danger);
+    padding: 10px 4px;
+    font-weight: 500
+  }
+
+  .confirm {
+    border: 1px solid var(--danger);
+    border-radius: 14px;
+    padding: 14px;
+    display: grid;
+    gap: 12px
+  }
+
+  .confirm p {
+    margin: 0
+  }
+
+  .confirm .row {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end
+  }
+
+  .btn-quiet {
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    border-radius: 10px;
+    padding: 10px 16px
+  }
+
+  .btn-danger {
+    border: 0;
+    background: var(--danger);
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-weight: 600
+  }
+
+  /* Focus player */
+  dialog.player {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    background: var(--bg);
+    color: var(--ink)
+  }
+
+  .pl {
+    min-height: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 22px;
+    padding-inline: 16px;
+    padding-block: calc(20px + env(safe-area-inset-top, 0px)) calc(24px + env(safe-area-inset-bottom, 0px))
+  }
+
+  .pl-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px
+  }
+
+  .pl-head h2 {
+    margin: 4px 0 0;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600
+  }
+
+  .pl-segs {
+    display: flex;
+    gap: 4px
+  }
+
+  .pl-segs i {
+    flex: 1;
+    height: 6px;
+    border-radius: 99px;
+    background: var(--line);
+    min-width: 4px
+  }
+
+  .pl-segs i.d {
+    background: var(--c)
+  }
+
+  .pl-segs i.cur {
+    background: color-mix(in srgb, var(--c) 40%, var(--line))
+  }
+
+  .pl-stage {
+    display: grid;
+    align-content: center;
+    gap: 14px
+  }
+
+  .pl-kicker {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--c);
+    font-weight: 500
+  }
+
+  .pl-step {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(32px, 9vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    text-wrap: balance;
+    overflow-wrap: anywhere
+  }
+
+  .pl-step small {
+    font-size: .45em;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0
+  }
+
+  .pl-meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums
+  }
+
+  .pl-timer {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(44px, 14vw, 72px);
+    font-weight: 500;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--c)
+  }
+
+  .pl-note {
+    margin: 0;
+    color: var(--muted);
+    max-width: 40ch
+  }
+
+  .pl-acts {
+    display: grid;
+    gap: 10px
+  }
+
+  .pl-go {
+    border: 0;
+    border-radius: 16px;
+    background: var(--c);
+    color: var(--on-c);
+    padding: 18px;
+    font-weight: 600;
+    font-size: 18px
+  }
+
+  .pl-row {
+    display: flex;
+    gap: 10px
+  }
+
+  .pl-row button {
+    flex: 1;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 13px 6px;
+    font-weight: 500
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    max-width: calc(100% - 32px);
+    width: max-content;
+    text-align: center;
+    z-index: 20
+  }
+
+  @media (prefers-reduced-motion:reduce) {
+    * {
+      transition: none !important;
+      animation: none !important
+    }
+  }
+</style>
+
+<main class="app">
+  <header class="top">
+    <div>
+      <p class="eyebrow" id="dateLabel">Today</p>
+      <h1 id="headline">Today</h1>
+      <p class="sub" id="subline">Loading your habits…</p>
+    </div>
+    <div class="ring" aria-hidden="true">
+      <svg viewBox="0 0 76 76">
+        <circle class="track" cx="38" cy="38" r="32" />
+        <circle class="fill" id="ringFill" cx="38" cy="38" r="32" stroke-dasharray="201.06"
+          stroke-dashoffset="201.06" />
+      </svg>
+      <span id="ringText">0/0</span>
+    </div>
+  </header>
+
+  <button type="button" class="now-btn" id="nowBtn" data-focusday hidden>
+    <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 4.5v15l12-7.5z" />
+      </svg></span>
+    <span><b>Focus mode</b><small id="nowSub">One thing at a time</small></span>
+  </button>
+
+  <section class="session" id="session" aria-live="polite"></section>
+
+  <section id="dueWrap" class="groups"></section>
+
+  <section id="restWrap" hidden>
+    <h2 class="section-label">Not scheduled today</h2>
+    <div id="restList" class="list"></div>
+  </section>
+
+  <section id="empty" class="empty" hidden>
+    <h2>Start with one habit.</h2>
+    <p>Pick something small you can do every day. Tap a suggestion or write your own — you can change the schedule
+      later.</p>
+    <div class="chips" id="emptyChips"></div>
+  </section>
+
+  <p class="sync" id="sync" hidden><i></i><span id="syncText"></span></p>
+</main>
+
+<button type="button" class="fab" id="addBtn"><svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 5v14M5 12h14" />
+  </svg>New habit</button>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
+  <form class="sheet-inner" id="habitForm" novalidate>
+    <div class="sheet-head">
+      <h2 id="sheetTitle">New habit</h2>
+      <div class="head-acts">
+        <button type="button" class="pill-btn" id="sheetFocus" hidden><svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 4.5v15l12-7.5z" />
+          </svg>Focus</button>
+        <button type="button" class="icon-btn" id="closeSheet" aria-label="Close"><svg viewBox="0 0 24 24">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg></button>
+      </div>
+    </div>
+
+    <div id="statsWrap" class="field" hidden>
+      <div class="stats" id="stats"></div>
+      <div>
+        <div class="hm" id="heatmap" role="group" aria-label="Last 16 weeks"></div>
+        <p class="hm-cap" id="hmCap"></p>
+      </div>
+      <p class="hint">Never miss twice: one missed day keeps your streak alive. Two in a row resets it.</p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="habitName">Name</label>
+      <input type="text" id="habitName" maxlength="60" autocomplete="off" placeholder="e.g. Deep work — 90 min">
+      <div class="chips" id="suggestChips"></div>
+    </div>
+
+    <div class="field" id="kindField">
+      <span class="label" id="kindLbl">Type</span>
+      <div class="seg" role="group" aria-labelledby="kindLbl">
+        <button type="button" data-kind="check" aria-pressed="true">Check</button>
+        <button type="button" data-kind="amount" aria-pressed="false">Amount</button>
+        <button type="button" data-kind="steps" aria-pressed="false">Checklist</button>
+        <button type="button" data-kind="routine" aria-pressed="false">Routine</button>
+        <button type="button" data-kind="meds" aria-pressed="false">Meds</button>
+      </div>
+      <p class="hint" id="kindHint"></p>
+    </div>
+
+    <div class="field" id="checkFields">
+      <label class="label" for="minIn">Focus timer (minutes, optional)</label>
+      <input type="number" id="minIn" inputmode="numeric" min="1" max="480" step="1" placeholder="e.g. 90">
+      <p class="hint">Focus mode counts it down and checks the habit off when time’s up.</p>
+    </div>
+
+    <div class="field" id="amountFields" hidden>
+      <div class="grid3">
+        <label for="goalIn"><span class="label">Daily goal</span><input type="number" id="goalIn" inputmode="numeric"
+            min="1" step="1"></label>
+        <label for="stepIn"><span class="label">Each tap</span><input type="number" id="stepIn" inputmode="numeric"
+            min="1" step="1"></label>
+        <label for="unitIn"><span class="label">Unit</span><input type="text" id="unitIn" maxlength="8"
+            autocomplete="off"></label>
+      </div>
+    </div>
+
+    <div class="field" id="stepsFields" hidden>
+      <span class="label" id="itemsLbl">Steps</span>
+      <ol class="items" id="itemsList" aria-labelledby="itemsLbl"></ol>
+      <button type="button" class="add-item" id="addItem">+ Add step</button>
+      <p class="hint" id="itemsHint">Press Enter to add the next one.</p>
+    </div>
+
+    <div class="field" id="sessionField" hidden>
+      <label class="label" for="sessionSel">When the routine is finished</label>
+      <select class="select" id="sessionSel">
+        <option value="">Nothing else</option>
+        <option value="start">Start a work session</option>
+        <option value="stop">End the work session</option>
+      </select>
+    </div>
+
+    <div class="field" id="slotField">
+      <label class="label" for="slotSel">Time of day</label>
+      <select class="select" id="slotSel"></select>
+    </div>
+
+    <div class="field">
+      <label class="label" for="afterSel">Stack it — do it after</label>
+      <select class="select" id="afterSel"></select>
+      <input type="text" id="afterText" maxlength="40" autocomplete="off" placeholder="e.g. Morning coffee" hidden>
+      <p class="hint">When the anchor is done, this habit lights up as “Up next”.</p>
+    </div>
+
+    <div class="field">
+      <span class="label" id="colorLbl">Color</span>
+      <div class="swatches" id="swatches" role="group" aria-labelledby="colorLbl"></div>
+    </div>
+
+    <div class="field" id="daysField">
+      <span class="label" id="daysLbl">Repeat on</span>
+      <div class="days" id="days" role="group" aria-labelledby="daysLbl"></div>
+      <div class="presets">
+        <button type="button" class="linkish" data-preset="all">Every day</button>
+        <button type="button" class="linkish" data-preset="sun-thu">Sun–Thu</button>
+        <button type="button" class="linkish" data-preset="fri-sat">Fri &amp; Sat</button>
+      </div>
+    </div>
+
+    <p class="error" id="formError" role="alert" hidden></p>
+
+    <div id="confirmDelete" class="confirm" hidden>
+      <p id="confirmText">Delete this habit and its history?</p>
+      <div class="row">
+        <button type="button" class="btn-quiet" id="cancelDelete">Keep it</button>
+        <button type="button" class="btn-danger" id="doDelete">Delete</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="danger-link" id="deleteBtn" hidden>Delete</button>
+      <button type="submit" class="primary" id="saveBtn">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="player" id="player" aria-labelledby="plTitle">
+  <div class="pl">
+    <div class="pl-head">
+      <div>
+        <p class="eyebrow" id="plCount">1 of 4</p>
+        <h2 id="plTitle">Focus</h2>
+      </div>
+      <button type="button" class="icon-btn" id="plClose" aria-label="Close focus mode"><svg viewBox="0 0 24 24">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg></button>
+    </div>
+    <div class="pl-segs" id="plSegs" aria-hidden="true"></div>
+    <div class="pl-stage" id="plStage" aria-live="polite"></div>
+    <div class="pl-acts" id="plActs"></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+  (() => {
+    const COLORS=[
+      {v: '#FF5A1F',n: 'Ember'},{v: '#2F6FE4',n: 'Cobalt'},{v: '#0E9F87',n: 'Teal'},
+      {v: '#A855C7',n: 'Orchid'},{v: '#B7791F',n: 'Mustard'},{v: '#5B7A2E',n: 'Moss'}
+    ];
+    const WEEK=[6,0,1,2,3,4,5];
+    const DAY_SHORT=['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const DAY_NAME=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const ALL=[0,1,2,3,4,5,6];
+    const WORKWEEK=[0,1,2,3,4];
+    // Hours run 4:00 → 28:00 so "night" wraps past midnight.
+    const SLOTS=[
+      {id: 'morning',label: 'Morning',from: 4,to: 12},
+      {id: 'afternoon',label: 'Afternoon',from: 12,to: 17},
+      {id: 'evening',label: 'Evening',from: 17,to: 21},
+      {id: 'night',label: 'Night',from: 21,to: 28}
+    ];
+    const SUGGESTIONS=[
+      {label: 'Drink water',name: 'Drink water',kind: 'amount',goal: 2500,step: 150,unit: 'ml'},
+      {label: '5 daily prayers',name: 'Prayers',kind: 'steps',items: ['Fajr','Dhuhr','Asr','Maghrib','Isha']},
+      {label: 'Meds & vitamins',name: 'Meds & vitamins',kind: 'meds',items: []},
+      {
+        label: 'Work start routine',name: 'Work start',kind: 'routine',session: 'start',slot: 'morning',days: WORKWEEK,
+        items: ['Fill your water bottle','Pick today’s top 3 tasks','Phone on Focus and out of reach','Open only what task #1 needs']
+      },
+      {
+        label: 'Shutdown routine',name: 'Shutdown',kind: 'routine',session: 'stop',slot: 'evening',days: WORKWEEK,
+        items: ['Write tomorrow’s top 3','Note where you stopped','Close Slack and email','Close the laptop and leave the desk']
+      },
+      {label: 'Movement breaks',name: 'Movement breaks',kind: 'amount',goal: 6,step: 1,unit: 'breaks',moves: true,days: WORKWEEK},
+      {label: 'Deep work — 90 min',name: 'Deep work — 90 min',minutes: 90},
+      {label: 'Read 20 pages',name: 'Read 20 pages'},
+      {label: 'Sleep by 12',name: 'Sleep by 12',slot: 'night'}
+    ];
+    const KIND_HINT={
+      check: 'One tap marks it done for the day.',
+      amount: 'Each tap adds to a daily goal — like a glass of water toward 2,500 ml.',
+      steps: 'Several parts a day, each with its own tap — like the five prayers.',
+      routine: 'Steps you play one at a time in a full-screen focus mode.',
+      meds: 'Each medicine or vitamin with its dose and time. Add how many are left to get a refill warning.'
+    };
+    const WEEKS=16;
+    const RING_C=144.51;
+    const LOW_STOCK=7;
+    const $=(id) => document.getElementById(id);
+
+    // ---------- dates ----------
+    const pad=(n) => String(n).padStart(2,'0');
+    const keyOf=(d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    const today=() => {const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate());};
+    const todayKey=() => keyOf(today());
+    const addDays=(d,n) => new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+    const fromKey=(k) => {const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d);};
+    const fmtShort=(d) => d.toLocaleDateString('en-GB',{weekday: 'short',day: 'numeric',month: 'short'});
+    const KEY_RE=/^\d{4}-\d{2}-\d{2}$/;
+    const num=(n) => Math.round(n).toLocaleString('en-US');
+    const fmtDur=(ms) => {const m=Math.max(0,Math.round(ms/60000)); return m<60? `${m} min`:`${Math.floor(m/60)}h ${m%60}m`;};
+    const fmtClock=(ms) => {const s=Math.max(0,Math.ceil(ms/1000)); const h=Math.floor(s/3600); const m=Math.floor((s%3600)/60); return h? `${h}:${pad(m)}:${pad(s%60)}`:`${m}:${pad(s%60)}`;};
+    const currentSlot=() => {const h=new Date().getHours(),hh=h<4? h+24:h; return (SLOTS.find((s) => hh>=s.from&&hh<s.to)||SLOTS[0]).id;};
+    const slotIdx=(id) => SLOTS.findIndex((s) => s.id===id);
+    const slotLabel=(id) => {const s=SLOTS.find((x) => x.id===id); return s? s.label:'Any time';};
+    const validSlot=(id) => (slotIdx(id)>=0? id:'');
+    const slotReached=(id) => !validSlot(id)||slotIdx(id)<=slotIdx(currentSlot());
+
+    // ---------- habit model ----------
+    const isObj=(v) => v&&typeof v==='object'&&!Array.isArray(v);
+    const safeColor=(c) => (/^#[0-9a-fA-F]{6}$/.test(c||'')? c:COLORS[0].v);
+    const typeOf=(h) => (h.type==='amount'||h.type==='steps'? h.type:'check');
+    const kindOf=(h) => (typeOf(h)!=='steps'? typeOf(h):h.meds===true? 'meds':h.routine===true? 'routine':'steps');
+    const daysOf=(h) => (Array.isArray(h.days)&&h.days.length? h.days:ALL);
+    // Meds: each item has its own rhythm — every day, every N days from a start date, or on set weekdays.
+    const repOf=(i) => (i&&(i.rep==='every'||i.rep==='days')? i.rep:'daily');
+    const everyOf=(i) => Math.max(2,Math.min(60,Math.round(Number(i.every))||2));
+    const wdOf=(i) => (Array.isArray(i.wd)? i.wd.filter((d) => d>=0&&d<=6):[]);
+    function itemDue(i,d) {
+      const r=repOf(i);
+      if(r==='days') return wdOf(i).includes(d.getDay());
+      if(r==='every') {
+        if(!KEY_RE.test(i.from||'')) return true;
+        const diff=Math.round((d-fromKey(i.from))/86400000);
+        return diff>=0&&diff%everyOf(i)===0;
+      }
+      return true;
+    }
+    function repLabel(i) {
+      const r=repOf(i);
+      if(r==='every') return `Every ${everyOf(i)} days`;
+      if(r==='days') {
+        const w=WEEK.filter((d) => wdOf(i).includes(d));
+        if(w.length===7) return '';
+        return w.length===1? `Weekly · ${DAY_NAME[w[0]]}`:w.map((d) => DAY_NAME[d]).join(' · ');
+      }
+      return '';
+    }
+    function nextDue(i) {
+      const t=today();
+      for(let k=1;k<=62;k++) {const d=addDays(t,k); if(itemDue(i,d)) return d;}
+      return null;
+    }
+    const itemsOf=(h) => (Array.isArray(h.items)? h.items.filter((i) => i&&i.id&&i.name):[]);
+    const dueItems=(h,d) => (h.meds===true? itemsOf(h).filter((i) => itemDue(i,d)):itemsOf(h));
+    const scheduled=(h,d) => daysOf(h).includes(d.getDay())&&(h.meds!==true||dueItems(h,d).length>0);
+    const goalOf=(h) => Math.max(1,Number(h.goal)||2500);
+    const stepOf=(h) => Math.max(1,Number(h.step)||150);
+    const unitOf=(h) => String(h.unit||'ml').slice(0,8);
+    const minutesOf=(x) => {const m=Number(x&&(x.minutes??x.min)); return m>0? Math.min(480,Math.round(m)):0;};
+    const amountOn=(h,k) => {const v=isObj(h.log)? h.log[k]:0; return typeof v==='number'&&v>0? v:0;};
+    const partsOn=(h,k) => (isObj(h.parts)&&isObj(h.parts[k])? h.parts[k]:{});
+    const doneItems=(h,k) => {const p=partsOn(h,k); return dueItems(h,fromKey(k)).filter((i) => p[i.id]===true);};
+    const byId=(id) => habits.find((x) => x.id===id);
+    const medsSorted=(h,list) => (list||itemsOf(h)).map((it,i) => ({it,i})).sort((a,b) => {
+      const sa=validSlot(a.it.slot)? slotIdx(a.it.slot):9,sb=validSlot(b.it.slot)? slotIdx(b.it.slot):9;
+      return sa-sb||a.i-b.i;
+    }).map((x) => x.it);
+    function nextItem(h) {
+      const p=partsOn(h,todayKey());
+      if(kindOf(h)==='meds') {
+        const pend=medsSorted(h,dueItems(h,today())).filter((i) => p[i.id]!==true);
+        return pend.find((i) => slotReached(i.slot))||pend[0];
+      }
+      return itemsOf(h).find((i) => p[i.id]!==true);
+    }
+
+    function progress(h,k) {
+      const t=typeOf(h);
+      if(t==='amount') return Math.min(1,amountOn(h,k)/goalOf(h));
+      if(t==='steps') {const it=dueItems(h,fromKey(k)); return it.length? doneItems(h,k).length/it.length:0;}
+      return isObj(h.done)&&h.done[k]===true? 1:0;
+    }
+    const isDone=(h,k) => progress(h,k)>=1;
+
+    function loggedKeys(h) {
+      const s=new Set();
+      for(const o of [h.done,h.log,h.parts]) if(isObj(o)) for(const k in o) if(KEY_RE.test(k)) s.add(k);
+      return [...s];
+    }
+    function startOf(h) {
+      let s=today();
+      if(h.createdAt) {const c=new Date(h.createdAt); s=new Date(c.getFullYear(),c.getMonth(),c.getDate());}
+      for(const k of loggedKeys(h)) if(progress(h,k)>0) {const d=fromKey(k); if(d<s) s=d;}
+      return s;
+    }
+    // Never miss twice: one missed scheduled day is forgiven; two in a row end the streak.
+    function streakInfo(h) {
+      const t=today(),s=startOf(h);
+      let d=t,n=0,pend=0;
+      if(scheduled(h,t)&&!isDone(h,keyOf(t))) d=addDays(t,-1);
+      for(let i=0;i<3000&&d>=s;i++,d=addDays(d,-1)) {
+        if(isDone(h,keyOf(d))) {n++; pend=0; continue;}
+        if(!scheduled(h,d)) continue;
+        pend++; if(pend>=2) break;
+      }
+      let risk=null;
+      if(n>0&&scheduled(h,t)&&!isDone(h,keyOf(t))) {
+        let p=addDays(t,-1);
+        for(let i=0;i<14&&p>=s;i++,p=addDays(p,-1)) {
+          if(!scheduled(h,p)) continue;
+          if(!isDone(h,keyOf(p))) risk=p;
+          break;
+        }
+      }
+      return {n,risk};
+    }
+    function bestStreak(h) {
+      const t=today(),tk=keyOf(t);
+      let d=startOf(h),run=0,best=0,pend=0;
+      for(let i=0;i<5000&&d<=t;i++,d=addDays(d,1)) {
+        const k=keyOf(d);
+        if(isDone(h,k)) {run++; pend=0; if(run>best) best=run;}
+        else if(scheduled(h,d)&&k!==tk) {pend++; if(pend>=2) run=0;}
+      }
+      return best;
+    }
+    function rate30(h) {
+      const t=today(),s=startOf(h);
+      let sched=0,hit=0;
+      for(let i=0;i<30;i++) {
+        const d=addDays(t,-i); if(d<s) break;
+        const k=keyOf(d);
+        if(!scheduled(h,d)) continue;
+        if(i===0&&!isDone(h,k)) continue;
+        sched++; if(isDone(h,k)) hit++;
+      }
+      return sched? Math.round((hit/sched)*100):null;
+    }
+    function scheduleLabel(days) {
+      const set=new Set(days&&days.length? days:ALL);
+      const eq=(arr) => arr.length===set.size&&arr.every((x) => set.has(x));
+      if(set.size===7) return 'Every day';
+      if(eq([0,1,2,3,4])) return 'Sun–Thu';
+      if(eq([1,2,3,4,5])) return 'Mon–Fri';
+      if(eq([5,6])) return 'Fri & Sat';
+      return WEEK.filter((d) => set.has(d)).map((d) => DAY_NAME[d]).join(' · ');
+    }
+    function stackLabel(h) {
+      if(typeof h.after==='string'&&h.after) {
+        const [hid,iid]=h.after.split('/');
+        const target=byId(hid);
+        if(!target) return '';
+        if(iid) {const it=itemsOf(target).find((i) => i.id===iid); return it? it.name:'';}
+        return target.name||'';
+      }
+      return typeof h.afterText==='string'? h.afterText.trim():'';
+    }
+    const esc=(s) => String(s??'').replace(/[&<>"']/g,(c) => ({'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;'}[c]));
+
+    // Display order: the current time of day first, then all-day, then later, then earlier.
+    function groupOrder() {
+      const c=currentSlot(),ci=slotIdx(c);
+      return [c,'',...SLOTS.filter((_,i) => i>ci).map((s) => s.id),...SLOTS.filter((_,i) => i<ci).map((s) => s.id)];
+    }
+    const sortByCreated=(a,b) => (a.createdAt||0)-(b.createdAt||0);
+
+    // ---------- stores ----------
+    function merge(target,patch) {
+      for(const k in patch) {
+        if(isObj(patch[k])&&isObj(target[k])) merge(target[k],patch[k]);
+        else target[k]=(isObj(patch[k])||Array.isArray(patch[k]))? JSON.parse(JSON.stringify(patch[k])):patch[k];
+      }
+    }
+    function applyLocal(h,patch) {
+      for(const k in patch) {
+        if(isObj(patch[k])) h[k]=applyLocal(isObj(h[k])? {...h[k]}:{},patch[k]);
+        else h[k]=Array.isArray(patch[k])? JSON.parse(JSON.stringify(patch[k])):patch[k];
+      }
+      return h;
+    }
+    const sleep=(ms) => new Promise((r) => setTimeout(r,ms));
+    async function withRetry(fn) {
+      try {return await fn();}
+      catch(e) {if(e&&e.code==='unavailable') {await sleep(400+Math.random()*600); return fn();} throw e;}
+    }
+    function makeDbStore(db) {
+      const col=db.collection('habits');
+      const queues=new Map();
+      const enqueue=(id,fn) => {
+        const next=(queues.get(id)||Promise.resolve()).then(() => withRetry(fn));
+        queues.set(id,next.catch(() => {}));
+        return next;
+      };
+      return {
+        kind: 'db',
+        subscribe(cb,onErr) {return col.onSnapshot((snap) => cb(snap.docs.map((d) => ({id: d.id,...d.data()})),snap.metadata),onErr);},
+        add(data) {return withRetry(() => col.add(data));},
+        patch(id,p) {return enqueue(id,() => col.doc(id).update(p));},
+        remove(id) {return enqueue(id,() => col.doc(id).delete());}
+      };
+    }
+    function makeLocalStore() {
+      const KEY='streakline.habits.v1';
+      let list=[];
+      try {list=JSON.parse(localStorage.getItem(KEY)||'[]'); if(!Array.isArray(list)) list=[];} catch(e) {list=[];}
+      let listener=null;
+      const emit=() => {
+        try {localStorage.setItem(KEY,JSON.stringify(list));} catch(e) { /* storage unavailable */}
+        if(listener) listener(JSON.parse(JSON.stringify(list)),{hasPendingWrites: false});
+      };
+      return {
+        kind: 'local',
+        subscribe(cb) {listener=cb; cb(JSON.parse(JSON.stringify(list)),{}); return () => {listener=null;};},
+        add(data) {list.push({id: 'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),...data}); emit(); return Promise.resolve();},
+        patch(id,p) {const h=list.find((x) => x.id===id); if(h) merge(h,p); emit(); return Promise.resolve();},
+        remove(id) {list=list.filter((x) => x.id!==id); emit(); return Promise.resolve();}
+      };
+    }
+
+    // ---------- state ----------
+    let store=null,habits=[],loaded=false,pending=false,popId=null;
+    let editingId=null,formDays=new Set(ALL),formColor=COLORS[0].v,formKind='check',formMoves=false,formItems=[];
+    let lastDay=todayKey();
+    const cueIds=new Set();
+
+    // ---------- rendering ----------
+    const ringSvg=(p) => `<svg class="pr" viewBox="0 0 52 52" aria-hidden="true"><circle class="t" cx="26" cy="26" r="23"/><circle class="f" cx="26" cy="26" r="23" stroke-dasharray="${RING_C}" stroke-dashoffset="${(RING_C*(1-p)).toFixed(2)}"/></svg>`;
+    const tickSvg='<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>';
+    const playSvg='<svg class="play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>';
+    const playPath='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>';
+    const linkSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7l-4 5 4 5M5 12h10a4 4 0 0 0 4-4V5"/></svg>';
+
+    function stripHTML(h,id,name) {
+      const t=today();
+      let out='';
+      for(let i=6;i>=0;i--) {
+        const day=addDays(t,-i),k=keyOf(day),p=progress(h,k),sc=scheduled(h,day);
+        const state=p>=1? 'is-done':p>0? 'is-partial':sc? 'is-missed':'is-rest';
+        const pct=Math.round(p*100);
+        out+=`<button type="button" class="cell ${state}${i===0? ' is-today':''}" style="--p:${pct}%" data-fill="${id}" data-key="${k}" aria-pressed="${p>=1}" aria-label="${name}, ${esc(fmtShort(day))}: ${pct}%${sc? '':' (rest day)'}">${DAY_SHORT[day.getDay()][0]}</button>`;
+      }
+      return `<div class="strip" role="group" aria-label="Last 7 days">${out}</div>`;
+    }
+    function nudgeHTML(h,tk) {
+      if(isDone(h,tk)) return '';
+      const last=Number(h.lastAt)||0;
+      if(!last||keyOf(new Date(last))!==tk) return '<p class="nudge">Nothing logged yet today</p>';
+      const mins=Math.max(0,Math.floor((Date.now()-last)/60000));
+      const ago=mins<1? 'just now':mins<60? `${mins} min ago`:`${Math.floor(mins/60)}h ${mins%60}m ago`;
+      if(mins>=120) return `<p class="nudge due">Last one ${ago} — time for another</p>`;
+      return `<p class="nudge">Last one ${ago}</p>`;
+    }
+    const stockHTML=(it) => (typeof it.stock==='number'
+      ? `<span class="stock${it.stock<=LOW_STOCK? ' low':''}">${it.stock} left${it.stock<=LOW_STOCK? ' — refill soon':''}</span>`:'');
+
+    function rowHTML(h,restRow) {
+      const t=today(),tk=keyOf(t),c=safeColor(h.color),id=esc(h.id),name=esc(h.name||'Untitled');
+      const kind=kindOf(h),p=progress(h,tk),full=p>=1,{n: s,risk}=streakInfo(h);
+      const pop=popId===h.id? ' pop':'';
+      const cue=!restRow&&!full&&cueIds.has(h.id);
+      const stack=stackLabel(h);
+      const mins=kind==='check'? minutesOf(h):0;
+      const streak=s>0? `<span class="streak on">${s}-day streak</span>`:`<span class="streak">No streak yet</span>`;
+      const showFocus=(kind==='check'||kind==='steps'||kind==='meds')&&!full;
+      const head=`${cue? `<span class="cue-tag">Up next${stack? ` · after ${esc(stack)}`:''}</span>`:''}
+      <div class="head-row">
+        <button type="button" class="habit-name" data-open="${id}"><span class="name">${name}</span><span class="meta">${streak}<span aria-hidden="true">·</span><span>${scheduleLabel(h.days)}</span>${mins? `<span aria-hidden="true">·</span><span>${mins} min timer</span>`:''}${stack? `<span aria-hidden="true">·</span><span class="after">${linkSvg}after ${esc(stack)}</span>`:''}</span></button>
+        ${showFocus? `<button type="button" class="focus-btn" data-focus="${id}" aria-label="Focus on ${name}">${playPath}</button>`:''}
+      </div>
+      ${risk? `<p class="risk">Missed ${DAY_NAME[risk.getDay()]} — don’t miss twice. Your ${s}-day streak is on the line.</p>`:''}`;
+      let lead='',extra='';
+
+      if(kind==='amount') {
+        const amt=amountOn(h,tk),goal=goalOf(h),step=stepOf(h),unit=esc(unitOf(h));
+        lead=`<button type="button" class="lead${full? ' full':''}${pop}" data-add="${id}" data-sign="1" aria-label="Add ${step} ${unit} to ${name}">${ringSvg(p)}<span class="lab">+${num(step)}</span></button>`;
+        extra=`<div class="amount"><span class="num"><b>${num(amt)}</b> / ${num(goal)} ${unit}</span>${amt>0? `<button type="button" class="mini" data-add="${id}" data-sign="-1" aria-label="Remove ${step} ${unit}">−${num(step)}</button>`:''}</div>
+        <div class="bar" aria-hidden="true"><i style="width:${Math.round(p*100)}%"></i></div>${h.moves? '':nudgeHTML(h,tk)}`;
+      } else if(kind==='meds') {
+        const items=medsSorted(h,dueItems(h,t)),pp=partsOn(h,tk),next=nextItem(h);
+        const doneN=items.filter((i) => pp[i.id]===true).length;
+        const tomorrow=keyOf(addDays(t,1));
+        const later=medsSorted(h).filter((i) => !itemDue(i,t)).map((i) => {
+          const nd=nextDue(i);
+          return nd? `${esc(i.name)} · ${keyOf(nd)===tomorrow? 'tomorrow':esc(fmtShort(nd))}`:'';
+        }).filter(Boolean);
+        const laterHTML=later.length? `<p class="later">Not today — next: ${later.join(', ')}</p>`:'';
+        lead=`<button type="button" class="lead${full? ' full':''}${pop}" data-next="${id}" aria-label="${next? `Mark ${esc(next.name)} taken`:`${name}: all taken today`}">${ringSvg(p)}${full? tickSvg:`<span class="lab">${doneN}/${items.length}</span>`}</button>`;
+        extra=`<ul class="meds">${items.map((i) => {
+          const d=pp[i.id]===true,isNext=next&&next.id===i.id;
+          return `<li><button type="button" class="med${d? ' is-done':''}${isNext? ' is-next':''}" data-item="${esc(i.id)}" data-habit="${id}" aria-pressed="${d}">
+          <span class="box"><svg class="ck" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5"/></svg></span>
+          <span class="nm"><b>${esc(i.name)}</b>${i.dose? `<span>${esc(i.dose)}</span>`:''}</span>
+          <span class="tag">${[validSlot(i.slot)? slotLabel(i.slot):'',esc(repLabel(i))].filter(Boolean).join('<br>')}</span></button>${stockHTML(i)}</li>`;
+        }).join('')}</ul>${laterHTML}`;
+      } else if(kind==='steps'||kind==='routine') {
+        const items=itemsOf(h),doneSet=new Set(doneItems(h,tk).map((i) => i.id));
+        const next=items.find((i) => !doneSet.has(i.id));
+        if(kind==='routine') {
+          lead=`<button type="button" class="lead${full? ' full':''}${pop}" data-focus="${id}" aria-label="${full? `${name}: done today`:`Start ${name}`}">${ringSvg(p)}${full? tickSvg:doneSet.size? `<span class="lab">${doneSet.size}/${items.length}</span>`:playSvg}</button>`;
+        } else {
+          lead=`<button type="button" class="lead${full? ' full':''}${pop}" data-next="${id}" aria-label="${next? `Mark ${esc(next.name)} done`:`${name}: all done today`}">${ringSvg(p)}${full? tickSvg:`<span class="lab">${doneSet.size}/${items.length}</span>`}</button>`;
+        }
+        extra=`<div class="parts" role="group" aria-label="${name} today">${items.map((i) => {
+          const d=doneSet.has(i.id),isNext=next&&next.id===i.id;
+          return `<button type="button" class="part${d? ' is-done':''}${isNext? ' is-next':''}" data-item="${esc(i.id)}" data-habit="${id}" aria-pressed="${d}"><svg class="ci" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/></svg><svg class="ck" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5"/></svg>${esc(i.name)}</button>`;
+        }).join('')}</div>`;
+      } else {
+        lead=`<button type="button" class="lead plain${full? ' full':''}${pop}" data-fill="${id}" data-key="${tk}" aria-pressed="${full}" aria-label="${full? 'Undo':'Mark done'}: ${name}">${tickSvg}</button>`;
+      }
+
+      return `<article class="habit${full? ' done':''}${restRow? ' rest':''}${cue? ' cue':''}" style="--c:${c}">
+      ${lead}
+      <div class="habit-body">${head}${extra}${stripHTML(h,id,name)}</div>
+    </article>`;
+    }
+
+    function render() {
+      const t=today(),tk=keyOf(t);
+      $('dateLabel').textContent=t.toLocaleDateString('en-GB',{weekday: 'long',day: 'numeric',month: 'long'});
+      if(!loaded) {
+        $('dueWrap').innerHTML='<div class="list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>';
+        return;
+      }
+      for(const id of [...cueIds]) {const h=byId(id); if(!h||isDone(h,tk)) cueIds.delete(id);}
+      const list=[...habits].sort(sortByCreated);
+      const due=list.filter((h) => scheduled(h,t));
+      const rest=list.filter((h) => !scheduled(h,t));
+      const doneN=due.filter((h) => isDone(h,tk)).length;
+      const atRisk=due.filter((h) => streakInfo(h).risk).length;
+      const frac=due.length? due.reduce((a,h) => a+progress(h,tk),0)/due.length:0;
+
+      $('ringFill').setAttribute('stroke-dashoffset',String(201.06*(1-frac)));
+      $('ringText').textContent=`${doneN}/${due.length}`;
+      const riskTxt=atRisk? ` · ${atRisk} streak${atRisk>1? 's':''} at risk`:'';
+      if(!list.length) {$('headline').textContent='Today'; $('subline').textContent='No habits yet';}
+      else if(!due.length) {$('headline').textContent='Rest day'; $('subline').textContent='Nothing scheduled today.';}
+      else if(doneN===due.length) {$('headline').textContent='All done'; $('subline').textContent=`${doneN} of ${due.length} — every streak is safe today.`;}
+      else {$('headline').textContent='Today'; $('subline').textContent=`${doneN} of ${due.length} done · ${due.length-doneN} to go${riskTxt}`;}
+
+      const cur=currentSlot();
+      const groups=groupOrder().map((sid) => ({sid,items: due.filter((h) => validSlot(h.slot)===sid)})).filter((g) => g.items.length);
+      $('dueWrap').innerHTML=groups.map((g) => {
+        const label=g.sid? `${slotLabel(g.sid)}${g.sid===cur? ' · now':''}`:'All day';
+        return `<div>${groups.length>1? `<h2 class="section-label${g.sid===cur? ' now':''}">${label}</h2>`:''}<div class="list">${g.items.map((h) => rowHTML(h,false)).join('')}</div></div>`;
+      }).join('');
+      $('dueWrap').hidden=!due.length;
+      $('restList').innerHTML=rest.map((h) => rowHTML(h,true)).join('');
+      $('restWrap').hidden=!rest.length;
+      $('empty').hidden=list.length>0;
+
+      const q=dayCards();
+      $('nowBtn').hidden=!q.length;
+      $('nowSub').textContent=`${q.length} thing${q.length>1? 's':''} for this ${slotLabel(cur).toLowerCase()}, one at a time`;
+      popId=null;
+      paintSync();
+    }
+    function paintSync() {
+      const el=$('sync');
+      if(!store) {el.hidden=true; return;}
+      el.hidden=false;
+      el.className='sync'+(store.kind==='local'? ' local':pending? ' saving':'');
+      $('syncText').textContent=store.kind==='local'? 'Saved on this device only':pending? 'Saving…':'Synced across your devices';
+    }
+
+    // ---------- actions ----------
+    function act(id,patch) {
+      const h=byId(id);
+      if(!h||!store) return null;
+      applyLocal(h,patch);
+      popId=id;
+      render();
+      refreshSheet();
+      if(player.open) paintPlayer();
+      store.patch(id,patch).catch(failToast);
+      return h;
+    }
+    function cueAfter(h,itemId) {
+      const tk=todayKey(),t=today();
+      const refs=[];
+      if(itemId) refs.push(`${h.id}/${itemId}`);
+      if(isDone(h,tk)) refs.push(h.id);
+      const next=habits.filter((x) => x.id!==h.id&&refs.includes(x.after)&&scheduled(x,t)&&!isDone(x,tk));
+      next.forEach((x) => cueIds.add(x.id));
+      if(next.length) render();
+      return next.length? ` · stacked next: ${next.map((x) => x.name).join(', ')}`:'';
+    }
+
+    function fillDay(id,k,quiet) {
+      const h=byId(id);
+      if(!h||!KEY_RE.test(k)) return;
+      const kind=typeOf(h),was=isDone(h,k),tk=todayKey();
+      let patch;
+      if(kind==='amount') patch={log: {[k]: was? 0:goalOf(h)}};
+      else if(kind==='steps') {
+        const list=dueItems(h,fromKey(k));
+        if(!list.length) return;
+        patch={parts: {[k]: Object.fromEntries(list.map((i) => [i.id,!was]))}};
+      }
+      else patch={done: {[k]: !was}};
+      act(id,patch);
+      const cue=!was&&k===tk? cueAfter(h):'';
+      if(!was&&k===tk&&kindOf(h)==='routine') routineFinished(h);
+      if(quiet) return;
+      if(kind!=='check'||cue) toast(`${k===tk? (kind==='check'? h.name:'Today'):fmtShort(fromKey(k))}: ${was? 'cleared':kind==='check'? 'done':'marked complete'}${cue}`);
+    }
+
+    function addAmount(id,sign,quiet) {
+      const h=byId(id);
+      if(!h) return;
+      const tk=todayKey(),step=stepOf(h),goal=goalOf(h),unit=unitOf(h);
+      const cur=amountOn(h,tk),next=Math.max(0,cur+sign*step);
+      if(next===cur) return;
+      const patch={log: {[tk]: next}};
+      if(sign>0) patch.lastAt=Date.now();
+      act(id,patch);
+      const cue=sign>0&&cur<goal&&next>=goal? cueAfter(h):'';
+      if(quiet) return;
+      if(sign>0&&cur<goal&&next>=goal) toast(`Goal reached — ${num(next)} ${unit} today${cue}`);
+      else if(sign>0) toast(`+${num(step)} ${unit} · ${num(next)} / ${num(goal)} · ${num(Math.max(0,goal-next))} to go`);
+      else toast(`−${num(step)} ${unit} · ${num(next)} / ${num(goal)}`);
+    }
+
+    function toggleItem(id,itemId,quiet) {
+      const h=byId(id);
+      if(!h) return;
+      const tk=todayKey(),items=itemsOf(h),item=items.find((i) => i.id===itemId);
+      if(!item) return;
+      const was=partsOn(h,tk)[itemId]===true,wasFull=isDone(h,tk),kind=kindOf(h);
+      const patch={parts: {[tk]: {[itemId]: !was}}};
+      let stockNote='';
+      if(kind==='meds'&&typeof item.stock==='number') {
+        const ns=Math.max(0,item.stock+(was? 1:-1));
+        patch.items=items.map((i) => (i.id===itemId? {...i,stock: ns}:i));
+        stockNote=ns<=LOW_STOCK? ` · ${ns} left — refill soon`:` · ${ns} left`;
+      }
+      act(id,patch);
+      const doneN=doneItems(h,tk).length;
+      const dueN=dueItems(h,today()).length;
+      if(was) {if(!quiet) toast(`${item.name} unchecked · ${doneN} of ${dueN}${stockNote}`); return;}
+      const cue=cueAfter(h,itemId);
+      let sess='';
+      if(!wasFull&&isDone(h,tk)&&kind==='routine') sess=routineFinished(h);
+      if(quiet) return;
+      const next=nextItem(h);
+      const verb=kind==='meds'? 'taken':'done';
+      toast((next? `${item.name} ${verb} — ${doneN} of ${dueN} · next: ${next.name}`:`All ${dueN} ${verb} today — streak safe`)+stockNote+cue+(sess? ` · ${sess}`:''));
+    }
+
+    function markNext(id) {
+      const h=byId(id);
+      if(!h) return;
+      const next=nextItem(h);
+      if(next) toggleItem(id,next.id);
+      else toast('All done today. Tap one to undo it.');
+    }
+
+    // ---------- work session & movement breaks (per device) ----------
+    const SKEY='streakline.session.v1';
+    let session={running: false,interval: 50,startedAt: 0,nextAt: 0,alerted: false};
+    try {const s=JSON.parse(localStorage.getItem(SKEY)||'null'); if(isObj(s)) session={...session,...s};} catch(e) { /* no storage */}
+    const saveSession=() => {try {localStorage.setItem(SKEY,JSON.stringify(session));} catch(e) { /* no storage */} };
+    let actx=null;
+    function primeAudio() {
+      try {actx=actx||new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==='suspended') actx.resume();} catch(e) {actx=null;}
+    }
+    function chime() {
+      if(!actx) return;
+      try {
+        const now=actx.currentTime;
+        [[660,0],[880,0.22]].forEach(([f,dt]) => {
+          const o=actx.createOscillator(),g=actx.createGain();
+          o.type='sine'; o.frequency.value=f;
+          g.gain.setValueAtTime(0.0001,now+dt);
+          g.gain.linearRampToValueAtTime(0.18,now+dt+0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001,now+dt+0.7);
+          o.connect(g); g.connect(actx.destination);
+          o.start(now+dt); o.stop(now+dt+0.75);
+        });
+      } catch(e) { /* audio unavailable */}
+    }
+    const movesHabit=() => habits.find((h) => h.moves===true&&typeOf(h)==='amount');
+    function startSession() {
+      primeAudio();
+      const now=Date.now();
+      session={...session,running: true,startedAt: now,nextAt: now+session.interval*60000,alerted: false};
+      saveSession(); paintSession();
+    }
+    function stopSession() {
+      const dur=Date.now()-session.startedAt;
+      session={...session,running: false,alerted: false};
+      saveSession(); paintSession();
+      return dur;
+    }
+    function routineFinished(h) {
+      let note='';
+      if(h.session==='start'&&!session.running) {startSession(); note=`Work session started — first break in ${session.interval} min.`;}
+      else if(h.session==='stop'&&session.running) {const d=stopSession(); note=`Work session ended — ${fmtDur(d)} of work. Good place to stop.`;}
+      if(note&&player.open) {pl.note=note; paintPlayer();}
+      return note;
+    }
+    function paintSession() {
+      const el=$('session'),now=Date.now();
+      if(!session.running) {
+        el.className='session';
+        el.innerHTML=`<div class="s-main"><p class="s-kick">Work session</p><p class="s-text">Nudge me to move every <select id="sessInterval" aria-label="Break interval">${[25,45,50,60,90].map((m) => `<option value="${m}"${m===session.interval? ' selected':''}>${m} min</option>`).join('')}</select></p></div>
+        <button type="button" class="s-btn go" data-sess="start">Start</button>`;
+        return;
+      }
+      if(now>=session.nextAt) {
+        el.className='session due';
+        const mh=movesHabit();
+        el.innerHTML=`<div class="s-main"><p class="s-kick">Break time · working ${fmtDur(now-session.startedAt)}</p><p class="s-text">Stand up, stretch, refill your water.${mh? ` (${num(amountOn(mh,todayKey()))} of ${num(goalOf(mh))} breaks)`:''}</p></div>
+        <div class="s-acts"><button type="button" class="s-btn go" data-sess="moved">I moved</button><button type="button" class="s-btn" data-sess="snooze">+10 min</button></div>`;
+        return;
+      }
+      const left=session.nextAt-now,pct=Math.min(100,Math.max(0,100*(1-left/(session.interval*60000))));
+      el.className='session running';
+      el.innerHTML=`<div class="s-main"><p class="s-kick">Working · ${fmtDur(now-session.startedAt)}</p><p class="s-text">Next break in ${fmtDur(left)}</p><div class="s-bar" aria-hidden="true"><i style="width:${pct.toFixed(1)}%"></i></div></div>
+      <button type="button" class="s-btn" data-sess="stop">End session</button>`;
+    }
+    function sessionTick() {
+      if(!session.running) return;
+      if(Date.now()>=session.nextAt&&!session.alerted) {session.alerted=true; saveSession(); chime();}
+      paintSession();
+    }
+    function onSessionAction(a) {
+      const now=Date.now();
+      if(a==='start') {startSession(); toast(`Work session started — first break in ${session.interval} min`); return;}
+      if(a==='stop') {const d=stopSession(); toast(`Session ended — ${fmtDur(d)} of work`); return;}
+      primeAudio();
+      if(a==='moved') {
+        const mh=movesHabit();
+        session.nextAt=now+session.interval*60000;
+        session.alerted=false; saveSession(); paintSession();
+        if(mh) addAmount(mh.id,1); else toast('Nice. Next break in '+session.interval+' min');
+      }
+      if(a==='snooze') {session.nextAt=now+10*60000; session.alerted=false; saveSession(); paintSession(); toast('Break in 10 min');}
+    }
+
+    // ---------- focus mode (one thing at a time) ----------
+    // A queue of cards. A card is a whole habit ({hid}) or one step of it ({hid, iid}).
+    const player=$('player');
+    let pl={mode: 'habit',hid: null,cards: [],idx: 0,stepAt: 0,note: '',slot: ''};
+    let tm={key: null,left: 0,endsAt: 0,running: false,fired: false};
+    let plTick=null,wake=null;
+
+    function cardsForHabit(h,dayMode) {
+      const kind=kindOf(h),p=partsOn(h,todayKey());
+      if(kind==='check'||kind==='amount') return [{hid: h.id}];
+      const items=kind==='meds'? medsSorted(h,dueItems(h,today())):itemsOf(h);
+      if(!dayMode) return items.map((i) => ({hid: h.id,iid: i.id}));
+      const pend=items.filter((i) => p[i.id]!==true);
+      if(kind==='routine') return pend.map((i) => ({hid: h.id,iid: i.id}));
+      if(kind==='meds') return pend.filter((i) => slotReached(i.slot)).map((i) => ({hid: h.id,iid: i.id}));
+      return pend.length? [{hid: h.id,iid: pend[0].id}]:[];
+    }
+    function dayCards() {
+      if(!loaded) return [];
+      const t=today(),tk=keyOf(t),cur=slotIdx(currentSlot());
+      const due=habits.filter((h) => scheduled(h,t)&&!isDone(h,tk)).sort(sortByCreated);
+      const order=groupOrder().filter((sid) => !sid||slotIdx(sid)<=cur);
+      const out=[];
+      for(const sid of order) for(const h of due) if(validSlot(h.slot)===sid) out.push(...cardsForHabit(h,true));
+      return out;
+    }
+    const cardKey=(c) => c.hid+(c.iid? '/'+c.iid:'');
+    const cardItem=(c) => {const h=byId(c.hid); return h&&c.iid? itemsOf(h).find((i) => i.id===c.iid):null;};
+    function cardDone(c) {
+      const h=byId(c.hid);
+      if(!h) return true;
+      return c.iid? partsOn(h,todayKey())[c.iid]===true:isDone(h,todayKey());
+    }
+    const cardTitle=(c) => {const h=byId(c.hid),it=cardItem(c); return it? it.name:h? h.name:'';};
+    const cardMinutes=(c) => {const h=byId(c.hid),it=cardItem(c); if(it) return minutesOf(it); return h&&kindOf(h)==='check'? minutesOf(h):0;};
+    function firstPending(from) {for(let i=from;i<pl.cards.length;i++) if(!cardDone(pl.cards[i])) return i; return pl.cards.length;}
+
+    async function requestWake() {try {if(navigator.wakeLock) wake=await navigator.wakeLock.request('screen');} catch(e) {wake=null;} }
+    function releaseWake() {try {if(wake) wake.release();} catch(e) { /* ignore */} wake=null;}
+
+    function openFocus(hid) {
+      const h=byId(hid);
+      if(!h) return;
+      pl={mode: 'habit',hid,cards: cardsForHabit(h,false),idx: 0,stepAt: Date.now(),note: '',slot: ''};
+      pl.idx=firstPending(0);
+      startPlayer();
+    }
+    function openDay() {
+      const cards=dayCards();
+      if(!cards.length) {toast('Nothing left for now. Nice.'); return;}
+      pl={mode: 'day',hid: null,cards,idx: 0,stepAt: Date.now(),note: '',slot: currentSlot()};
+      startPlayer();
+    }
+    function startPlayer() {
+      tm={key: null,left: 0,endsAt: 0,running: false,fired: false};
+      primeAudio();
+      paintPlayer();
+      if(!player.open) player.showModal();
+      requestWake();
+      clearInterval(plTick);
+      plTick=setInterval(tickPlayer,500);
+    }
+    function closePlayer() {if(player.open) player.close();}
+    player.addEventListener('close',() => {clearInterval(plTick); releaseWake(); tm.running=false;});
+
+    function syncTimer(c) {
+      const key=c? cardKey(c):null;
+      if(tm.key===key) return;
+      const m=c? cardMinutes(c):0;
+      tm={key,left: m*60000,endsAt: 0,running: false,fired: false};
+    }
+    const timerLeft=() => (tm.running? Math.max(0,tm.endsAt-Date.now()):tm.left);
+
+    function tickPlayer() {
+      if(!player.open) return;
+      const c=pl.cards[pl.idx];
+      if(tm.running&&c&&cardKey(c)===tm.key&&Date.now()>=tm.endsAt&&!tm.fired) {
+        tm.fired=true; tm.running=false; tm.left=0;
+        chime();
+        const m=cardMinutes(c);
+        completeCard(c);
+        pl.note=`Time’s up — ${m} min done.`;
+        paintPlayer();
+        return;
+      }
+      const el=$('plTimer');
+      if(el) el.textContent=fmtClock(timerLeft());
+      const ck=$('plClock');
+      if(ck) ck.textContent=fmtClock(Date.now()-pl.stepAt);
+    }
+
+    function completeCard(c) {
+      if(cardDone(c)) return;
+      if(c.iid) toggleItem(c.hid,c.iid,true);
+      else fillDay(c.hid,todayKey(),true);
+    }
+
+    function paintPlayer() {
+      const cards=pl.cards;
+      if(!cards.length) {closePlayer(); return;}
+      const first=byId(cards[Math.min(pl.idx,cards.length-1)].hid);
+      player.style.setProperty('--c',safeColor(first? first.color:''));
+      $('plSegs').innerHTML=cards.map((c,i) => `<i class="${cardDone(c)? 'd':i===pl.idx? 'cur':''}"></i>`).join('');
+      const doneN=cards.filter(cardDone).length;
+
+      if(pl.idx>=cards.length) {
+        const left=cards.length-doneN;
+        const h=pl.mode==='habit'? byId(pl.hid):null;
+        $('plTitle').textContent=h? h.name:'Focus mode';
+        $('plCount').textContent=`${doneN} of ${cards.length} done`;
+        if(!left) {
+          const later=pl.mode==='day'? dayCards().length:0;
+          $('plStage').innerHTML=h
+            ? `<p class="pl-step">${esc(h.name)} — done.</p><p class="pl-meta">${streakInfo(h).n}-day streak</p><p class="pl-note">${esc(pl.note)}</p>`
+            :`<p class="pl-step">You’re clear for now.</p><p class="pl-meta">${doneN} thing${doneN===1? '':'s'} done</p><p class="pl-note">${esc(pl.note||(later? `${later} more just came up.`:'Come back when the next part of the day starts.'))}</p>`;
+          $('plActs').innerHTML=later? `<button type="button" class="pl-go" data-pl="again">Keep going (${later})</button><div class="pl-row"><button type="button" data-pl="close">Done for now</button></div>`:`<button type="button" class="pl-go" data-pl="close">Close</button>`;
+        } else {
+          $('plStage').innerHTML=`<p class="pl-step">${left} left.</p><p class="pl-note">You skipped ${left===1? 'one':'some'}. Do ${left===1? 'it':'them'} now, or come back later.</p>`;
+          $('plActs').innerHTML=`<button type="button" class="pl-go" data-pl="rest">Do the skipped ${left===1? 'one':'ones'}</button><div class="pl-row"><button type="button" data-pl="close">Later</button></div>`;
+        }
+        return;
+      }
+
+      const c=cards[pl.idx],h=byId(c.hid);
+      if(!h) {pl.idx=firstPending(pl.idx+1); paintPlayer(); return;}
+      player.style.setProperty('--c',safeColor(h.color));
+      syncTimer(c);
+      const kind=kindOf(h),it=cardItem(c),isD=cardDone(c),mins=cardMinutes(c);
+      $('plTitle').textContent=pl.mode==='day'? `Focus · ${slotLabel(pl.slot)}`:h.name;
+      $('plCount').textContent=`${pl.idx+1} of ${cards.length}`;
+      let nextIdx=-1;
+      for(let i=pl.idx+1;i<cards.length;i++) if(!cardDone(cards[i])) {nextIdx=i; break;}
+      const then=nextIdx>=0? `<p class="pl-note">Then: ${esc(cardTitle(cards[nextIdx]))}</p>`:'<p class="pl-note">Last one.</p>';
+      const note=pl.note? `<p class="pl-note">${esc(pl.note)}</p>`:'';
+      const back=`<button type="button" data-pl="back"${pl.idx===0? ' disabled':''}>Back</button>`;
+
+      if(kind==='amount'&&!c.iid) {
+        const amt=amountOn(h,todayKey()),goal=goalOf(h),unit=esc(unitOf(h)),step=stepOf(h);
+        $('plStage').innerHTML=`<p class="pl-kicker">${esc(h.name)}</p><p class="pl-step">${num(amt)} <small>/ ${num(goal)} ${unit}</small></p>
+        <div class="bar" aria-hidden="true"><i style="width:${Math.round(progress(h,todayKey())*100)}%"></i></div>${note}${then}`;
+        $('plActs').innerHTML=isD
+          ? `<button type="button" class="pl-go" data-pl="skip">Goal reached — next</button><div class="pl-row">${back}</div>`
+          :`<button type="button" class="pl-go" data-pl="add">+${num(step)} ${unit}</button><div class="pl-row">${back}<button type="button" data-pl="skip">Next</button></div>`;
+        return;
+      }
+
+      const kicker=it? h.name:(validSlot(h.slot)? slotLabel(h.slot):'Habit');
+      const medLine=kind==='meds'&&it? `<p class="pl-meta">${[it.dose,validSlot(it.slot)? slotLabel(it.slot):'',typeof it.stock==='number'? `${it.stock} left`:''].filter(Boolean).map(esc).join(' · ')}</p>`:'';
+      const clock=isD? '':mins? `<p class="pl-timer" id="plTimer">${fmtClock(timerLeft())}</p>`:`<p class="pl-meta" id="plClock">${fmtClock(Date.now()-pl.stepAt)}</p>`;
+      $('plStage').innerHTML=`<p class="pl-kicker">${esc(kicker)}</p><p class="pl-step">${esc(cardTitle(c))}</p>${medLine}${clock}${note}${then}`;
+      const doneLabel=kind==='meds'? 'Taken':'Done';
+      if(isD) {
+        $('plActs').innerHTML=`<button type="button" class="pl-go" data-pl="skip">${nextIdx>=0? 'Next':'Finish'}</button><div class="pl-row">${back}</div>`;
+      } else if(mins) {
+        const started=tm.running||tm.left<mins*60000;
+        $('plActs').innerHTML=`<button type="button" class="pl-go" data-pl="timer">${tm.running? 'Pause':started? 'Resume':`Start ${mins} min`}</button>
+        <div class="pl-row">${back}<button type="button" data-pl="skip">Skip</button><button type="button" data-pl="done">${doneLabel} early</button></div>`;
+      } else {
+        $('plActs').innerHTML=`<button type="button" class="pl-go" data-pl="done">${doneLabel}</button><div class="pl-row">${back}<button type="button" data-pl="skip">Skip for now</button></div>`;
+      }
+    }
+
+    function onPlayerAction(a) {
+      const c=pl.cards[pl.idx];
+      if(a==='close') {closePlayer(); return;}
+      if(a==='timer') {
+        primeAudio();
+        if(tm.running) {tm.left=Math.max(0,tm.endsAt-Date.now()); tm.running=false;}
+        else {tm.endsAt=Date.now()+tm.left; tm.running=true;}
+        paintPlayer(); return;
+      }
+      if(a==='add'&&c) {addAmount(c.hid,1,true); pl.note=''; paintPlayer(); return;}
+      pl.note='';
+      if(a==='done'&&c) {completeCard(c); pl.idx=firstPending(pl.idx+1);}
+      else if(a==='skip') pl.idx=firstPending(pl.idx+1);
+      else if(a==='back') pl.idx=Math.max(0,pl.idx-1);
+      else if(a==='rest') pl.idx=firstPending(0);
+      else if(a==='again') {pl.cards=dayCards(); pl.idx=0; pl.slot=currentSlot();}
+      pl.stepAt=Date.now();
+      paintPlayer();
+    }
+
+    // ---------- sheet ----------
+    const sheet=$('sheet');
+    const chipHTML=(s,i) => `<button type="button" class="chip" data-suggest="${i}">${esc(s.label)}</button>`;
+    $('emptyChips').innerHTML=SUGGESTIONS.map(chipHTML).join('');
+    $('suggestChips').innerHTML=SUGGESTIONS.map(chipHTML).join('');
+    $('slotSel').innerHTML=`<option value="">Any time</option>`+SLOTS.map((s) => `<option value="${s.id}">${s.label}</option>`).join('');
+
+    function nextColor() {
+      const used=new Set(habits.map((h) => safeColor(h.color)));
+      const free=COLORS.find((c) => !used.has(c.v));
+      return free? free.v:COLORS[habits.length%COLORS.length].v;
+    }
+    let uidN=0;
+    const newUid=() => 'n'+Date.now().toString(36)+(uidN++);
+    const blankItem=() => ({uid: newUid(),id: '',name: '',dose: '',slot: '',stock: '',min: '',rep: 'daily',every: '2',from: todayKey(),wd: []});
+    function toFormItems(src) {
+      const list=src&&Array.isArray(src.items)? src.items:[];
+      const out=list.map((i) => (typeof i==='string'
+        ? {...blankItem(),name: i}
+        :{
+          uid: newUid(),id: i.id||'',name: i.name||'',dose: i.dose||'',slot: validSlot(i.slot),stock: typeof i.stock==='number'? String(i.stock):'',min: i.min? String(i.min):'',
+          rep: repOf(i),every: String(everyOf(i)),from: KEY_RE.test(i.from||'')? i.from:todayKey(),wd: wdOf(i)
+        }));
+      return out.length? out:[blankItem()];
+    }
+
+    const upSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
+    const downSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>';
+    const xSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    function paintItems(focusIdx) {
+      const kind=formKind,meds=kind==='meds',last=formItems.length-1;
+      const ph=meds? 'e.g. Vitamin D':kind==='routine'? 'e.g. Fill your water bottle':'e.g. Fajr';
+      $('itemsList').innerHTML=formItems.map((it,i) => `<li class="it">
+      <div class="it-row"><span class="it-num">${i+1}</span>
+        <input type="text" class="it-name" id="itn-${it.uid}" data-i="${i}" data-f="name" value="${esc(it.name)}" maxlength="40" placeholder="${ph}" aria-label="${meds? 'Medicine':'Step'} ${i+1}" autocomplete="off" enterkeyhint="next">
+        <button type="button" class="it-btn" data-imove="${i}" data-dir="-1" aria-label="Move up"${i===0? ' disabled':''}>${upSvg}</button>
+        <button type="button" class="it-btn" data-imove="${i}" data-dir="1" aria-label="Move down"${i===last? ' disabled':''}>${downSvg}</button>
+        <button type="button" class="it-btn" data-idel="${i}" aria-label="Remove ${meds? 'medicine':'step'} ${i+1}">${xSvg}</button>
+      </div>
+      ${meds? `<div class="it-extra">
+        <input type="text" class="dose" id="itd-${it.uid}" data-i="${i}" data-f="dose" value="${esc(it.dose)}" maxlength="24" placeholder="Dose, e.g. 1 capsule" aria-label="Dose" autocomplete="off">
+        <select id="its-${it.uid}" data-i="${i}" data-f="slot" aria-label="Time of day"><option value="">Any time</option>${SLOTS.map((s) => `<option value="${s.id}"${s.id===it.slot? ' selected':''}>${s.label}</option>`).join('')}</select>
+        <input type="number" class="xs" id="itk-${it.uid}" data-i="${i}" data-f="stock" value="${esc(it.stock)}" min="0" max="999" inputmode="numeric" placeholder="Left" aria-label="Doses left (optional)">
+      </div>
+      <div class="it-extra it-sched">
+        <select id="itr-${it.uid}" data-i="${i}" data-f="rep" aria-label="How often">
+          <option value="daily"${it.rep==='daily'? ' selected':''}>Every day</option>
+          <option value="every"${it.rep==='every'? ' selected':''}>Every few days</option>
+          <option value="days"${it.rep==='days'? ' selected':''}>On set days of the week</option>
+        </select>
+        ${it.rep==='every'? `<label for="ite-${it.uid}">every <input type="number" class="xs" id="ite-${it.uid}" data-i="${i}" data-f="every" value="${esc(it.every)}" min="2" max="60" inputmode="numeric"> days</label>
+          <label for="itf-${it.uid}">next dose <input type="date" id="itf-${it.uid}" data-i="${i}" data-f="from" value="${esc(it.from)}"></label>`:''}
+        ${it.rep==='days'? `<div class="mdays" role="group" aria-label="Days for ${esc(it.name||'this one')}">${WEEK.map((d) => `<button type="button" class="mday" data-iday="${i}" data-d="${d}" aria-pressed="${it.wd.includes(d)}" aria-label="${DAY_NAME[d]}">${DAY_SHORT[d]}</button>`).join('')}</div>`:''}
+      </div>` :kind==='routine'? `<div class="it-extra"><label for="itm-${it.uid}"><input type="number" class="xs" id="itm-${it.uid}" data-i="${i}" data-f="min" value="${esc(it.min)}" min="1" max="240" inputmode="numeric" placeholder="—"> min timer (optional)</label></div>`:''}
+    </li>`).join('');
+      $('addItem').textContent=meds? '+ Add medicine':'+ Add step';
+      $('itemsHint').textContent=meds? 'Each one has its own rhythm: every day, every few days, or set weekdays (twice a week, weekly…). Add how many are left to get a refill warning.':'Press Enter to add the next one. Use the arrows to reorder.';
+      if(focusIdx!=null&&formItems[focusIdx]) {
+        const el=$('itn-'+formItems[focusIdx].uid);
+        if(el) {el.focus(); const v=el.value; try {el.setSelectionRange(v.length,v.length);} catch(e) { /* ignore */} }
+      }
+    }
+    function paintForm() {
+      sheet.style.setProperty('--c',formColor);
+      $('swatches').innerHTML=COLORS.map((c) =>
+        `<button type="button" class="swatch" style="--sw:${c.v}" data-color="${c.v}" aria-pressed="${c.v===formColor}" aria-label="${c.n}"></button>`).join('');
+      $('days').innerHTML=WEEK.map((d) =>
+        `<button type="button" class="day" data-day="${d}" aria-pressed="${formDays.has(d)}" aria-label="${DAY_NAME[d]}">${DAY_SHORT[d]}</button>`).join('');
+      document.querySelectorAll('[data-kind]').forEach((b) => b.setAttribute('aria-pressed',String(b.dataset.kind===formKind)));
+      $('kindHint').textContent=KIND_HINT[formKind];
+      $('checkFields').hidden=formKind!=='check';
+      $('amountFields').hidden=formKind!=='amount';
+      const listy=formKind==='steps'||formKind==='routine'||formKind==='meds';
+      $('stepsFields').hidden=!listy;
+      $('itemsLbl').textContent=formKind==='meds'? 'Medicines & vitamins':'Steps';
+      $('sessionField').hidden=formKind!=='routine';
+      $('slotField').hidden=formKind==='meds';
+      $('daysField').hidden=formKind==='meds'; // each medicine has its own rhythm
+      if(listy) paintItems();
+    }
+    function setKindDefaults(kind,src) {
+      formKind=kind;
+      formMoves=!!(src&&src.moves);
+      if(kind==='amount') {
+        $('goalIn').value=src&&src.goal? src.goal:2500;
+        $('stepIn').value=src&&src.step? src.step:150;
+        $('unitIn').value=src&&src.unit? src.unit:'ml';
+      }
+      $('minIn').value=kind==='check'&&src&&minutesOf(src)? minutesOf(src):'';
+      formItems=toFormItems(src&&(kind==='steps'||kind==='routine'||kind==='meds')? src:null);
+      $('sessionSel').value=kind==='routine'&&src&&(src.session==='start'||src.session==='stop')? src.session:'';
+      $('slotSel').value=src? validSlot(src.slot):'';
+    }
+    function paintAfterOptions(h) {
+      const cur=h? (h.after||(h.afterText? '__custom':'')):'';
+      let opts='<option value="">No anchor</option>';
+      for(const x of [...habits].sort(sortByCreated)) {
+        if(h&&x.id===h.id) continue;
+        opts+=`<option value="${esc(x.id)}">${esc(x.name)}</option>`;
+        if(typeOf(x)==='steps'&&kindOf(x)!=='meds') for(const it of itemsOf(x)) opts+=`<option value="${esc(x.id+'/'+it.id)}">${esc(x.name)} → ${esc(it.name)}</option>`;
+      }
+      opts+='<option value="__custom">Something else…</option>';
+      $('afterSel').innerHTML=opts;
+      $('afterSel').value=cur;
+      if($('afterSel').value!==cur) $('afterSel').value='';
+      $('afterText').value=h&&h.afterText? h.afterText:'';
+      $('afterText').hidden=$('afterSel').value!=='__custom';
+    }
+    $('afterSel').addEventListener('change',() => {
+      $('afterText').hidden=$('afterSel').value!=='__custom';
+      if(!$('afterText').hidden) $('afterText').focus();
+    });
+
+    // step editor events
+    const onItemField=(e) => {
+      const t=e.target;
+      if(!t.dataset||t.dataset.f==null||t.dataset.i==null) return;
+      const it=formItems[Number(t.dataset.i)];
+      if(!it) return;
+      const changed=it[t.dataset.f]!==t.value;
+      it[t.dataset.f]=t.value;
+      if(t.dataset.f==='rep'&&changed) {
+        if(it.rep==='days'&&!it.wd.length) it.wd=[today().getDay()];
+        paintItems();
+        const sel=$('itr-'+it.uid); if(sel) sel.focus();
+      }
+    };
+    $('itemsList').addEventListener('input',onItemField);
+    $('itemsList').addEventListener('change',onItemField);
+    $('itemsList').addEventListener('keydown',(e) => {
+      const t=e.target;
+      if(!t.classList||!t.classList.contains('it-name')) return;
+      const i=Number(t.dataset.i);
+      if(e.key==='Enter'&&!e.isComposing) {
+        e.preventDefault();
+        formItems.splice(i+1,0,blankItem());
+        paintItems(i+1);
+      } else if(e.key==='Backspace'&&t.value===''&&formItems.length>1) {
+        e.preventDefault();
+        formItems.splice(i,1);
+        paintItems(Math.max(0,i-1));
+      }
+    });
+    $('addItem').addEventListener('click',() => {
+      const lastEmpty=formItems.length&&!String(formItems[formItems.length-1].name).trim();
+      if(!lastEmpty) formItems.push(blankItem());
+      paintItems(formItems.length-1);
+    });
+
+    function paintStats(h) {
+      const t=today(),tk=keyOf(t),cur=streakInfo(h).n,best=bestStreak(h),r=rate30(h);
+      let fourth;
+      if(typeOf(h)==='amount') {
+        let sum=0; for(let i=0;i<7;i++) sum+=amountOn(h,keyOf(addDays(t,-i)));
+        fourth=`<div class="stat"><b>${num(sum/7)}</b><span>Avg ${esc(unitOf(h))} / day (7d)</span></div>`;
+      } else {
+        const total=loggedKeys(h).filter((k) => isDone(h,k)).length;
+        fourth=`<div class="stat"><b>${total}</b><span>Days done</span></div>`;
+      }
+      $('stats').innerHTML=`
+      <div class="stat${cur? ' hot':''}"><b>${cur}</b><span>Current streak</span></div>
+      <div class="stat"><b>${Math.max(best,cur)}</b><span>Best streak</span></div>
+      <div class="stat"><b>${r===null? '—':r+'%'}</b><span>Last 30 days</span></div>${fourth}`;
+      const wi=(t.getDay()+1)%7;
+      const start=addDays(t,-wi-(WEEKS-1)*7);
+      let html=WEEK.map((d,i) => `<span class="lbl">${i%2===0? DAY_SHORT[d]:''}</span>`).join('');
+      for(let i=0;i<WEEKS*7;i++) {
+        const d=addDays(start,i),k=keyOf(d);
+        if(d>t) {html+='<span class="hc future"></span>'; continue;}
+        const p=progress(h,k),sc=scheduled(h,d);
+        const state=p>=1? 'is-done':p>0? 'is-partial':sc? 'is-missed':'is-rest';
+        html+=`<button type="button" class="hc ${state}${k===tk? ' is-today':''}" style="--p:${Math.round(p*100)}%" data-fill="${esc(h.id)}" data-key="${k}" aria-pressed="${p>=1}" aria-label="${esc(fmtShort(d))}: ${Math.round(p*100)}%"></button>`;
+      }
+      $('heatmap').innerHTML=html;
+      $('hmCap').textContent=`${fmtShort(start)} – ${fmtShort(t)} · tap a day to fill or clear it`;
+    }
+    function refreshSheet() {
+      if(!sheet.open||!editingId) return;
+      const h=byId(editingId);
+      if(h) paintStats(h); else closeSheet();
+    }
+    function openSheet(id,sug) {
+      const h=id? byId(id):null;
+      editingId=h? h.id:null;
+      $('sheetTitle').textContent=h? 'Edit habit':'New habit';
+      $('habitName').value=h? (h.name||''):(sug? sug.name:'');
+      formColor=h? safeColor(h.color):nextColor();
+      formDays=new Set(h? daysOf(h):(sug&&sug.days)||ALL);
+      setKindDefaults(h? kindOf(h):(sug&&sug.kind)||'check',h||sug);
+      paintAfterOptions(h);
+      $('statsWrap').hidden=!h;
+      $('deleteBtn').hidden=!h;
+      $('sheetFocus').hidden=!h||kindOf(h)==='amount';
+      $('suggestChips').hidden=!!h;
+      $('kindField').hidden=!!h;
+      $('confirmDelete').hidden=true;
+      $('formError').hidden=true;
+      paintForm();
+      if(h) paintStats(h);
+      if(!sheet.open) sheet.showModal();
+      if(!h&&!sug) setTimeout(() => $('habitName').focus(),60);
+      else if(!h&&sug&&sug.kind==='meds') setTimeout(() => paintItems(0),60);
+    }
+    function closeSheet() {if(sheet.open) sheet.close(); editingId=null;}
+    function showError(msg) {$('formError').textContent=msg; $('formError').hidden=false; $('formError').scrollIntoView({block: 'nearest'});}
+
+    $('habitForm').addEventListener('submit',async (e) => {
+      e.preventDefault();
+      const id=editingId,h=id? byId(id):null;
+      const kind=h? kindOf(h):formKind;
+      const name=$('habitName').value.trim();
+      if(!name) return showError('Give the habit a name.');
+      if(!formDays.size) return showError('Pick at least one day.');
+      const days=WEEK.filter((d) => formDays.has(d)).sort((a,b) => a-b);
+      const afterVal=$('afterSel').value;
+      const afterText=afterVal==='__custom'? $('afterText').value.trim().slice(0,40):'';
+      if(afterVal==='__custom'&&!afterText) return showError('Write what it comes after, or pick an anchor from the list.');
+      const fields={name,color: formColor,days,after: afterVal&&afterVal!=='__custom'? afterVal:'',afterText,slot: kind==='meds'? '':validSlot($('slotSel').value)};
+
+      if(kind==='check') {
+        const m=Math.round(Number($('minIn').value));
+        fields.minutes=m>0? Math.min(480,m):0;
+      }
+      if(kind==='amount') {
+        const goal=Math.round(Number($('goalIn').value)),step=Math.round(Number($('stepIn').value));
+        if(!(goal>0)) return showError('Set a daily goal above zero.');
+        if(!(step>0)) return showError('Set how much each tap adds.');
+        if(step>goal) return showError('Each tap can’t be more than the daily goal.');
+        Object.assign(fields,{goal,step,unit: $('unitIn').value.trim().slice(0,8)||'ml'});
+      }
+      if(kind==='steps'||kind==='routine'||kind==='meds') {
+        const clean=formItems.map((it) => ({...it,name: String(it.name||'').trim().slice(0,40)})).filter((it) => it.name).slice(0,20);
+        const min=kind==='meds'? 1:2;
+        if(clean.length<min) return showError(kind==='meds'? 'Add at least one medicine or vitamin.':'Add at least two steps.');
+        const noDays=kind==='meds'&&clean.find((it) => it.rep==='days'&&!(it.wd||[]).length);
+        if(noDays) return showError(`Pick at least one day for ${noDays.name}.`);
+        if(kind==='meds') fields.days=ALL;
+        fields.items=clean.map((it,i) => {
+          const o={id: it.id||('s'+Date.now().toString(36)+i+Math.random().toString(36).slice(2,5)),name: it.name};
+          if(kind==='meds') {
+            o.dose=String(it.dose||'').trim().slice(0,24);
+            o.slot=validSlot(it.slot);
+            const st=String(it.stock??'').trim();
+            if(st!==''&&Number.isFinite(Number(st))) o.stock=Math.max(0,Math.min(999,Math.round(Number(st))));
+            o.rep=it.rep==='every'||it.rep==='days'? it.rep:'daily';
+            if(o.rep==='every') {o.every=everyOf({every: it.every}); o.from=KEY_RE.test(it.from||'')? it.from:todayKey();}
+            if(o.rep==='days') o.wd=WEEK.filter((d) => (it.wd||[]).includes(d));
+          }
+          if(kind==='routine') {const m=Math.round(Number(it.min)); if(m>0) o.min=Math.min(240,m);}
+          return o;
+        });
+      }
+      if(kind==='routine') fields.session=$('sessionSel').value;
+
+      closeSheet();
+      try {
+        if(id) await store.patch(id,fields);
+        else {
+          const base=kind==='amount'? {type: 'amount',log: {},...(formMoves? {moves: true}:{})}
+            :kind==='steps'? {type: 'steps',parts: {}}
+              :kind==='routine'? {type: 'steps',routine: true,parts: {}}
+                :kind==='meds'? {type: 'steps',meds: true,parts: {}}
+                  :{done: {}};
+          await store.add({...fields,...base,createdAt: Date.now()});
+        }
+      } catch(err) {failToast(err);}
+    });
+
+    $('closeSheet').addEventListener('click',closeSheet);
+    sheet.addEventListener('click',(e) => {if(e.target===sheet) closeSheet();});
+    sheet.addEventListener('close',() => {editingId=null;});
+    $('addBtn').addEventListener('click',() => openSheet(null));
+    $('plClose').addEventListener('click',closePlayer);
+    $('sheetFocus').addEventListener('click',() => {const id=editingId; closeSheet(); if(id) openFocus(id);});
+    $('deleteBtn').addEventListener('click',() => {
+      const h=byId(editingId);
+      $('confirmText').textContent=`Delete “${h? h.name:'this habit'}” and all of its history? This can’t be undone.`;
+      $('confirmDelete').hidden=false;
+    });
+    $('cancelDelete').addEventListener('click',() => {$('confirmDelete').hidden=true;});
+    $('doDelete').addEventListener('click',async () => {
+      const id=editingId; closeSheet();
+      if(!id) return;
+      try {await store.remove(id); toast('Habit deleted');} catch(err) {failToast(err);}
+    });
+    document.addEventListener('change',(e) => {
+      if(e.target&&e.target.id==='sessInterval') {session.interval=Number(e.target.value)||50; saveSession();}
+    });
+
+    // one delegated handler for every tap target
+    document.addEventListener('click',(e) => {
+      const t=e.target;
+      let el;
+      if((el=t.closest('[data-pl]'))) {onPlayerAction(el.dataset.pl); return;}
+      if((el=t.closest('[data-focusday]'))) {openDay(); return;}
+      if((el=t.closest('[data-focus]'))) {openFocus(el.dataset.focus); return;}
+      if((el=t.closest('[data-sess]'))) {onSessionAction(el.dataset.sess); return;}
+      if((el=t.closest('[data-add]'))) {addAmount(el.dataset.add,Number(el.dataset.sign)||1); return;}
+      if((el=t.closest('[data-item]'))) {toggleItem(el.dataset.habit,el.dataset.item); return;}
+      if((el=t.closest('[data-next]'))) {markNext(el.dataset.next); return;}
+      if((el=t.closest('[data-fill]'))) {fillDay(el.dataset.fill,el.dataset.key); return;}
+      if((el=t.closest('[data-open]'))) {openSheet(el.dataset.open); return;}
+      if((el=t.closest('[data-imove]'))) {
+        const i=Number(el.dataset.imove),j=i+Number(el.dataset.dir);
+        if(j>=0&&j<formItems.length) {[formItems[i],formItems[j]]=[formItems[j],formItems[i]]; paintItems();}
+        return;
+      }
+      if((el=t.closest('[data-iday]'))) {
+        const it=formItems[Number(el.dataset.iday)],d=Number(el.dataset.d);
+        if(it) {it.wd=it.wd.includes(d)? it.wd.filter((x) => x!==d):[...it.wd,d]; el.setAttribute('aria-pressed',String(it.wd.includes(d)));}
+        return;
+      }
+      if((el=t.closest('[data-idel]'))) {
+        formItems.splice(Number(el.dataset.idel),1);
+        if(!formItems.length) formItems.push(blankItem());
+        paintItems(); return;
+      }
+      if((el=t.closest('[data-color]'))) {formColor=el.dataset.color; paintForm(); return;}
+      if((el=t.closest('[data-kind]'))) {setKindDefaults(el.dataset.kind,null); paintForm(); return;}
+      if((el=t.closest('[data-day]'))) {const d=Number(el.dataset.day); formDays.has(d)? formDays.delete(d):formDays.add(d); paintForm(); return;}
+      if((el=t.closest('[data-preset]'))) {
+        formDays=new Set(el.dataset.preset==='all'? ALL:el.dataset.preset==='sun-thu'? WORKWEEK:[5,6]);
+        paintForm(); return;
+      }
+      if((el=t.closest('[data-suggest]'))) {
+        const s=SUGGESTIONS[Number(el.dataset.suggest)];
+        if(!s) return;
+        if(sheet.open&&!editingId) {
+          $('habitName').value=s.name;
+          setKindDefaults(s.kind||'check',s);
+          if(s.days) formDays=new Set(s.days);
+          paintForm();
+        } else openSheet(null,s);
+      }
+    });
+
+    // ---------- toast ----------
+    let toastTimer=null;
+    function toast(msg) {
+      const el=$('toast'); el.textContent=msg; el.hidden=false;
+      clearTimeout(toastTimer); toastTimer=setTimeout(() => {el.hidden=true;},3400);
+    }
+    function failToast(err) {
+      const code=err&&err.code;
+      if(code==='quota_exceeded') toast('Storage is full. Delete a habit to add more.');
+      else if(code==='revoked'||code==='not_granted') toast('You no longer have access to save here.');
+      else toast('Couldn’t save that. Check your connection and try again.');
+    }
+
+    // ---------- boot ----------
+    function onData(list,meta) {
+      habits=list; loaded=true; pending=!!(meta&&meta.hasPendingWrites);
+      render();
+      refreshSheet();
+      if(player.open) paintPlayer();
+      if(session.running) paintSession();
+    }
+    function subscribe() {
+      store.subscribe(onData,(err) => {
+        if(err&&err.code==='unavailable') setTimeout(subscribe,1500+Math.random()*1500);
+        else toast('Sync stopped. Reload the page to reconnect.');
+      });
+    }
+
+    render();
+    paintSession();
+    (async () => {
+      let db=null;
+      try {db=window.claude&&typeof window.claude.use==='function'? await window.claude.use('db'):null;} catch(e) {db=null;}
+      store=db? makeDbStore(db):makeLocalStore();
+      subscribe();
+    })();
+
+    let lastSlot=currentSlot();
+    const checkDay=() => {
+      const k=todayKey(),s=currentSlot();
+      if(k!==lastDay) {lastDay=k; lastSlot=s; cueIds.clear(); render();}
+      else if(s!==lastSlot) {lastSlot=s; render();}
+    };
+    setInterval(sessionTick,15000);
+    setInterval(() => {
+      checkDay();
+      if(loaded&&!sheet.open&&habits.some((h) => typeOf(h)==='amount')) render();
+    },60000);
+    document.addEventListener('visibilitychange',() => {
+      if(document.hidden) return;
+      checkDay(); sessionTick();
+      if(loaded) render();
+      if(player.open) {requestWake(); tickPlayer();}
+    });
+  })();
+</script>
